@@ -14,6 +14,7 @@ export default defineConfig({
             "@layout": "/src/layout",
             "@styles": "/src/styles",
             "@assets": "/src/assets",
+            "@components": "/src/components",
         },
     },
     server: { open: true },

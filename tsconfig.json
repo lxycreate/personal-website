@@ -22,7 +22,8 @@
             "@router/*": ["src/router/*"],
             "@layout/*": ["src/layout/*"],
             "@styles/*": ["src/styles/*"],
-            "@assets/*": ["src/assets/*"]
+            "@assets/*": ["src/assets/*"],
+            "@components/*": ["src/components/*"]
         }
     },
     "include": ["src"]

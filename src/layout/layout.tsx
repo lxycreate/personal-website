@@ -1,28 +1,56 @@
 import React, { useState } from "react";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import { Outlet } from "react-router-dom";
+import { Layout, theme } from "antd";
+import { Outlet, NavLink, useMatches } from "react-router-dom";
 import Logo from "@assets/icon/logo.svg";
 import "./layout.less";
 
 const { Header, Sider, Content } = Layout;
 
+interface RouteMenu {
+    path: string;
+    label: string;
+}
 const menus = [
     {
-        key: "HTML",
+        path: "/html",
         label: "HTML",
     },
     {
-        key: "CSS",
+        path: "/css",
         label: "CSS",
     },
     {
-        key: "JavaScript",
+        path: "/javascript",
         label: "JavaScript",
     },
 ];
+
+const secondMenus: { [key: string]: RouteMenu[] } = {
+    "/html": [
+        {
+            path: "/html/default",
+            label: "HTML",
+        },
+    ],
+    "/css": [
+        {
+            path: "/css/default",
+            label: "CSS",
+        },
+    ],
+    "/javascript": [
+        {
+            path: "/javascript/default",
+            label: "JavaScript",
+        },
+    ],
+};
 const App: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false);
+    const matches = useMatches(),
+        current = menus.find((v) => matches.find((t) => t.pathname === v.path));
+    const [sMenus, setSMenus] = useState(
+        ((current && secondMenus[current.path]) || []) as RouteMenu[]
+    );
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -36,23 +64,46 @@ const App: React.FC = () => {
                     <img src={Logo} className="logo-img" />
                     前端
                 </div>
-                <Menu
-                    theme="dark"
-                    mode="horizontal"
-                    defaultSelectedKeys={["1"]}
-                    items={menus}
-                />
+                {menus.map((m) => (
+                    <NavLink
+                        className="nav-link"
+                        to={m.path}
+                        key={m.path}
+                        onClick={() => setSMenus(secondMenus[m.path] || [])}
+                    >
+                        {m.label}
+                    </NavLink>
+                ))}
             </Header>
-
-            <Layout className="site-layout">
-                <Content
+            <Content>
+                <Layout
                     style={{
                         background: colorBgContainer,
                     }}
                 >
-                    <Outlet></Outlet>
-                </Content>
-            </Layout>
+                    <Sider
+                        className="sider"
+                        style={{
+                            paddingTop: "20px",
+                            background: colorBgContainer,
+                        }}
+                        width={200}
+                    >
+                        {sMenus.map((v) => (
+                            <NavLink
+                                key={v.path}
+                                className="s-nav-link"
+                                to={v.path}
+                            >
+                                {v.label}
+                            </NavLink>
+                        ))}
+                    </Sider>
+                    <Content style={{ paddingLeft: "20px" }}>
+                        <Outlet></Outlet>
+                    </Content>
+                </Layout>
+            </Content>
         </Layout>
     );
 };
