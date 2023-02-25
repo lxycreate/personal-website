@@ -1,16 +1,26 @@
 import React, { useState } from "react";
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    UploadOutlined,
-    UserOutlined,
-    VideoCameraOutlined,
-} from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
+import { Outlet } from "react-router-dom";
+import Logo from "@assets/icon/logo.svg";
 import "./layout.less";
 
 const { Header, Sider, Content } = Layout;
 
+const menus = [
+    {
+        key: "HTML",
+        label: "HTML",
+    },
+    {
+        key: "CSS",
+        label: "CSS",
+    },
+    {
+        key: "JavaScript",
+        label: "JavaScript",
+    },
+];
 const App: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
     const {
@@ -19,50 +29,28 @@ const App: React.FC = () => {
 
     return (
         <Layout>
-            <Sider trigger={null} collapsible collapsed={collapsed}>
-                <div className="logo" />
+            <Header
+                style={{ position: "sticky", top: 0, zIndex: 1, width: "100%" }}
+            >
+                <div className="logo">
+                    <img src={Logo} className="logo-img" />
+                    前端
+                </div>
                 <Menu
                     theme="dark"
-                    mode="inline"
+                    mode="horizontal"
                     defaultSelectedKeys={["1"]}
-                    items={[
-                        {
-                            key: "1",
-                            icon: <UserOutlined />,
-                            label: "nav 1",
-                        },
-                        {
-                            key: "2",
-                            icon: <VideoCameraOutlined />,
-                            label: "nav 2",
-                        },
-                        {
-                            key: "3",
-                            icon: <UploadOutlined />,
-                            label: "nav 3",
-                        },
-                    ]}
+                    items={menus}
                 />
-            </Sider>
+            </Header>
+
             <Layout className="site-layout">
-                <Header style={{ padding: 0, background: colorBgContainer }}>
-                    {React.createElement(
-                        collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-                        {
-                            className: "trigger",
-                            onClick: () => setCollapsed(!collapsed),
-                        }
-                    )}
-                </Header>
                 <Content
                     style={{
-                        margin: "24px 16px",
-                        padding: 24,
-                        minHeight: 280,
                         background: colorBgContainer,
                     }}
                 >
-                    Content
+                    <Outlet></Outlet>
                 </Content>
             </Layout>
         </Layout>

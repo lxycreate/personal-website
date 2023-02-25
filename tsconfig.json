@@ -21,7 +21,8 @@
             "@views/*": ["src/views/*"],
             "@router/*": ["src/router/*"],
             "@layout/*": ["src/layout/*"],
-            "@styles/*": ["src/styles/*"]
+            "@styles/*": ["src/styles/*"],
+            "@assets/*": ["src/assets/*"]
         }
     },
     "include": ["src"]

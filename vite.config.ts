@@ -12,6 +12,7 @@ export default defineConfig({
             "@router": "/src/router",
             "@layout": "/src/layout",
             "@styles": "/src/styles",
+            "@assets": "/src/assets",
         },
     },
     server: { open: true },
