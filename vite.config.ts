@@ -16,6 +16,7 @@ export default defineConfig({
         },
     },
     server: { open: true },
+    build: { outDir: "docs" },
     css: {
         preprocessorOptions: {
             less: {
