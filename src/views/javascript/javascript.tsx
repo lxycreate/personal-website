@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Anchor, Row, Col } from "antd";
-import { CLink, CPicture } from "@components";
+import { CLink, CPicture } from "@components/index";
 import JsExe from "./imgs/js-exe.png";
 
 const anchors = [
@@ -26,7 +26,7 @@ const anchors = [
 ];
 export default function JavaScript() {
     const container: any = useRef();
-    const doClick = (e: MouseEvent, link: object) => {
+    const doClick = (e: any, link: object) => {
         e.preventDefault();
         console.log(link);
     };
