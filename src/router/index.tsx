@@ -1,8 +1,8 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createHashRouter, Navigate } from "react-router-dom";
 import Layout from "@layout/layout";
 import View from "@views/view";
 import JavaScript from "@views/javascript/javascript";
-const router = createBrowserRouter([
+const router = createHashRouter([
     {
         path: "/",
         element: <Layout />,
