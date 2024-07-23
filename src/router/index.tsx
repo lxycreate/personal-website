@@ -2,6 +2,7 @@ import { createHashRouter, Navigate } from "react-router-dom";
 import Layout from "@layout/layout";
 import View from "@views/view";
 import JavaScript from "@views/javascript/javascript";
+import Tools from "@views/tools/tools";
 import Html from "@views/html/html";
 import Css from "@views/css/css";
 const router = createHashRouter([
@@ -11,7 +12,11 @@ const router = createHashRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to="/javascript" />,
+                element: <Navigate to="/tools" />,
+            },
+            {
+                path: "/tools",
+                element: <Tools />,
             },
             {
                 path: "/html",

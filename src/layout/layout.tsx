@@ -81,7 +81,7 @@ const App: React.FC = () => {
                         background: colorBgContainer,
                     }}
                 >
-                    <Sider
+                    {/* <Sider
                         className="sider"
                         style={{
                             paddingTop: "20px",
@@ -98,7 +98,7 @@ const App: React.FC = () => {
                                 {v.label}
                             </NavLink>
                         ))}
-                    </Sider>
+                    </Sider> */}
                     <Content style={{ paddingLeft: "20px" }}>
                         <Outlet></Outlet>
                     </Content>
