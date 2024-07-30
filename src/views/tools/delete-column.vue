@@ -80,12 +80,22 @@ const doDeal = (group) => {
     const str = rule.value.trim();
     const temp = str.split(/\s+/).map(v => parseInt(v)).filter(v => !isNaN(v));
     const list = [];
+    const maxWidth = [];
     group.children.forEach(child => {
         const childStr = child.value.trim().split(/\s+/);
-        const res = childStr.filter((v, index) => !temp.includes(index + 1)).map(v => v.padStart(8, ' '));
-        list.push(res.join(' '));
+        const res = childStr.filter((v, index) => !temp.includes(index + 1));
+        res.forEach((v, index) => {
+            const width = maxWidth[index] || 0;
+            if (v.length > width) {
+                maxWidth[index] = v.length;
+            }
+        })
+        list.push(res);
     })
-    return list;
+    list.forEach(v => v.forEach((item, index) => {
+        v[index] = v[index].padStart(maxWidth[index], ' ');
+    }))
+    return list.map(v => v.join(' '));
 }
 
 const doDownload = (content, filename) => {
