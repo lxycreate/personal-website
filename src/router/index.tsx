@@ -3,6 +3,7 @@ import Layout from "@layout/layout";
 import View from "@views/view";
 import JavaScript from "@views/javascript/javascript";
 import Tools from "@views/tools/tools";
+import Remove from "@views/tools/remove";
 import Html from "@views/html/html";
 import Css from "@views/css/css";
 const router = createHashRouter([
@@ -17,6 +18,10 @@ const router = createHashRouter([
             {
                 path: "/tools",
                 element: <Tools />,
+            },
+            {
+                path: "/remove",
+                element: <Remove />,
             },
             {
                 path: "/html",

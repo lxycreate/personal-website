@@ -12,17 +12,21 @@ interface RouteMenu {
 }
 const menus = [
     {
-        path: "/html",
-        label: "HTML",
+        path: "/tools",
+        label: "格式化",
     },
     {
-        path: "/css",
-        label: "CSS",
+        path: "/remove",
+        label: "删列",
     },
-    {
-        path: "/javascript",
-        label: "JavaScript",
-    },
+    // {
+    //     path: "/css",
+    //     label: "CSS",
+    // },
+    // {
+    //     path: "/javascript",
+    //     label: "JavaScript",
+    // },
 ];
 
 const secondMenus: { [key: string]: RouteMenu[] } = {
@@ -62,7 +66,7 @@ const App: React.FC = () => {
             >
                 <div className="logo">
                     <img src={Logo} className="logo-img" />
-                    前端
+                    {/* 前端 */}
                 </div>
                 {menus.map((m) => (
                     <NavLink
