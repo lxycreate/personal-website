@@ -1,33 +1,29 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { resolve } from "path";
-
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
+import Components from 'unplugin-vue-components/vite';
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: "/personal-website",
-    plugins: [react()],
-    resolve: {
-        alias: {
-            "@": "/src",
-            "@views": "/src/views",
-            "@router": "/src/router",
-            "@layout": "/src/layout",
-            "@styles": "/src/styles",
-            "@assets": "/src/assets",
-            "@components": "/src/components",
-        },
-    },
-    server: { open: true },
-    build: { outDir: "docs" },
-    css: {
-        preprocessorOptions: {
-            less: {
-                javascriptEnabled: true,
-                additionalData: `@import "${resolve(
-                    __dirname,
-                    "src/styles/mixins.less"
-                )}";`,
-            },
-        },
-    },
-});
+  plugins: [vue(), Components({
+    resolvers: [
+      AntDesignVueResolver({
+        importStyle: false, // css in js
+      }),
+    ],
+  }),],
+  build: { outDir: "docs" },
+  server: {
+    open: true,
+    host: '0.0.0.0'
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+      '@comp': resolve(__dirname, './src/components'),
+      '@router': resolve(__dirname, './src/router'),
+      '@styles': resolve(__dirname, './src/styles'),
+      '@views': resolve(__dirname, './src/views'),
+    }
+  }
+})
