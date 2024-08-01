@@ -1,6 +1,14 @@
 <template>
     <div class="delete-column flex justify-center items-center mt-[12px] flex-col">
-        <Upload :file-list="fileList" :before-upload="doBeforeUpload">
+        <div class=" max-w-[500px] w-full">
+            <Alert message="文件有哪些组，如：Masses；多个以英文逗号,分割" type="info" show-icon />
+            <Textarea v-model:value="groupValue" :auto-size="{ minRows: 3 }" type="textarea"
+                placeholder="文件有哪些组，如：Masses；多个以英文逗号,分割" class="mt-[12px]" />
+            <Alert message="文件要删除哪些组，如：Masses；多个以英文逗号,分割" type="info" show-icon class="mt-[12px]" />
+            <Textarea v-model:value="deleteValue" :auto-size="{ minRows: 3 }" type="textarea"
+                placeholder="文件要删除哪些组，如：Masses；多个以英文逗号,分割" class="mt-[12px]" />
+        </div>
+        <Upload :file-list="fileList" :before-upload="doBeforeUpload" class="mt-[12px]">
             <Button type="primary">
                 <div class="flex justify-center items-center">
                     <UploadOutlined class="mr-[4px]" />点击上传
@@ -14,30 +22,76 @@
             </div>
         </div>
         <div class="mt-[12px]">
-            <Button type="primary" @click="doDelete">
+            <Button type="primary" :disabled="!fileData" class="mr-[12px]" @click="doPreview">
+                <div class="flex justify-center items-center">
+                    <EyeOutlined class="mr-[4px]" />预览
+                </div>
+            </Button>
+            <Button type="primary" :disabled="!fileData" @click="doDelete">
                 <div class="flex justify-center items-center">
                     <DeleteOutlined class="mr-[4px]" />删除
                 </div>
             </Button>
         </div>
+        <Modal v-model:open="previewVisible" title="预览" width="80%">
+            <div class="flex">
+                <div class="delete-column-old w-[50%] flex-1 mr-[8px]">
+                    <span class="text-[16px] font-bold">旧</span>
+                </div>
+                <div class="delete-column-new  w-[50%] flex-1">
+                    <span class="text-[16px] font-bold">新</span>
+                </div>
+            </div>
+            <div class="flex overflow-y-auto max-h-[80vh]">
+                <div class="delete-column-old w-[50%] flex-1 mr-[8px]">
+                    <div class="bg-gray-300 p-[12px] rounded-[4px]">
+                        <div v-for="(item, index) in fileParseList" :key="index" :class="{ 'mt-[12px]': item === '\r' }">
+                            {{ item }}
+                        </div>
+                    </div>
+                </div>
+                <div class="delete-column-new  w-[50%] flex-1">
+                    <div class="bg-gray-300 p-[12px] rounded-[4px]">
+                        <div v-for="(item, index) in previewValue" :key="index" :class="{ 'mt-[12px]': !item.trim() }">
+                            {{ item }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
 
 <script setup lang="ts">
 // @ts-nocheck
 import { computed, ref } from "vue";
-import { Upload, Button, Input } from 'ant-design-vue'
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import { debounce } from 'lodash-es'
+import { Upload, Button, Input, Textarea, Alert, Modal } from 'ant-design-vue'
+import { UploadOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons-vue';
 
 const fileData = ref(null);
-const fileStr = ref(null);
+const fileStr = ref('');
 const tableData = ref([]);
+const groupValue = ref('');
+const realGroupValue = ref('');
+const realDeleteValue = ref('');
+const deleteValue = ref('');
+const previewVisible = ref(false)
+const previewValue = ref([])
 
-const useGroups = ['Masses', 'Atoms']
-const groupNames = ['LAMMPS data file', 'Masses', 'Pair Coeffs', 'Bond Coeffs', 'Angle Coeffs', 'Dihedral Coeffs', 'Improper Coeffs', 'Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers']
+const defaultGroups = ['LAMMPS data file', 'Masses', 'Pair Coeffs', 'Bond Coeffs', 'Angle Coeffs', 'Dihedral Coeffs', 'Improper Coeffs', 'Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers'];
+const defaultDeleteGroups = ['Masses', 'Atoms'];
+
+const groupNames = computed(() => realGroupValue.value.split(',').map(v => v.trim()))
+const useGroups = computed(() => realDeleteValue.value.split(',').map(v => v.trim()))
+const fileParseList = computed(() => {
+    return fileStr.value.split('\n')
+})
+
 const isGroup = (line) => {
-    return groupNames.some((name) => line.startsWith(name))
+    return groupNames.value.some((name) => line.startsWith(name))
 }
+
 const fileGroup = computed(() => {
     const list = [];
     if (fileStr.value) {
@@ -71,6 +125,20 @@ const fileGroup = computed(() => {
 const fileList = computed(() => {
     return fileData.value ? [fileData.value] : [];
 });
+
+const doGroupsChange = () => {
+    realGroupValue.value = groupValue.value;
+    realDeleteValue.value = deleteValue.value;
+    if (fileData.value) {
+        doRead(fileData.value)
+    }
+}
+
+const doPreview = debounce(() => {
+    previewValue.value = getDealContent();
+    console.log(' previewValue.value : ',  previewValue.value );
+    previewVisible.value = true;
+}, 100)
 
 const doDeal = (group) => {
     const rule = tableData.value.find(v => v.key === group.value);
@@ -120,7 +188,7 @@ const doDownload = (content, filename) => {
     URL.revokeObjectURL(link.href);
 }
 
-const doDelete = () => {
+const getDealContent = () => {
     const result = [];
     fileGroup.value.forEach(item => {
         result.push(item.value);
@@ -128,15 +196,18 @@ const doDelete = () => {
             result.push(...doDeal(item));
         }
     })
-    doDownload(result.join('\n'), fileData.value.name)
-    console.log('result', result.join('\n'));
+    return result;
+}
+
+const doDelete = () => {
+    doDownload(getDealContent().join('\n'), fileData.value.name)
 }
 
 const doRead = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
         fileStr.value = e.target.result;
-        const list = fileGroup.value.filter(v => useGroups.some(g => v.value.startsWith(g)));
+        const list = fileGroup.value.filter(v => useGroups.value.some(g => v.value.startsWith(g)));
         tableData.value = list.filter(v => v.children?.length).map(item => ({ key: item.value, value: '' }))
         console.log(fileGroup.value)
     };
@@ -148,4 +219,24 @@ const doBeforeUpload = (file) => {
     doRead(file)
     return false;
 }
+
+const initParams = () => {
+    const temp = localStorage.getItem('delete-groups');
+    if (temp) {
+        deleteValue.value = JSON.parse(temp).join(',');
+    } else {
+        deleteValue.value = defaultDeleteGroups.join(',');
+    }
+    realDeleteValue.value = deleteValue.value;
+    const str = localStorage.getItem('all-groups');
+    if (str) {
+        groupValue.value = JSON.parse(temp).join(',');
+    } else {
+        groupValue.value = defaultGroups.join(',');
+    }
+    realGroupValue.value = groupValue.value;
+}
+
+initParams();
+
 </script>
