@@ -3,10 +3,10 @@
         <div class=" max-w-[500px] w-full">
             <Alert message="文件有哪些组，如：Masses；多个以英文逗号,分割" type="info" show-icon />
             <Textarea v-model:value="groupValue" :auto-size="{ minRows: 3 }" type="textarea"
-                placeholder="文件有哪些组，如：Masses；多个以英文逗号,分割" class="mt-[12px]" />
+                placeholder="文件有哪些组，如：Masses；多个以英文逗号,分割" class="mt-[12px]" @blur="doGroupsChange" />
             <Alert message="文件要删除哪些组，如：Masses；多个以英文逗号,分割" type="info" show-icon class="mt-[12px]" />
             <Textarea v-model:value="deleteValue" :auto-size="{ minRows: 3 }" type="textarea"
-                placeholder="文件要删除哪些组，如：Masses；多个以英文逗号,分割" class="mt-[12px]" />
+                placeholder="文件要删除哪些组，如：Masses；多个以英文逗号,分割" class="mt-[12px]" @blur="doGroupsChange" />
         </div>
         <Upload :file-list="fileList" :before-upload="doBeforeUpload" class="mt-[12px]">
             <Button type="primary">
@@ -33,7 +33,7 @@
                 </div>
             </Button>
         </div>
-        <Modal v-model:open="previewVisible" title="预览" width="80%">
+        <Modal v-model:open="previewVisible" title="预览" width="80%" okText="下载" @ok="doDelete">
             <div class="flex">
                 <div class="delete-column-old w-[50%] flex-1 mr-[8px]">
                     <span class="text-[16px] font-bold">旧</span>
@@ -45,14 +45,16 @@
             <div class="flex overflow-y-auto max-h-[80vh]">
                 <div class="delete-column-old w-[50%] flex-1 mr-[8px]">
                     <div class="bg-gray-300 p-[12px] rounded-[4px]">
-                        <div v-for="(item, index) in fileParseList" :key="index" :class="{ 'mt-[12px]': item === '\r' }">
+                        <div v-for="(item, index) in fileParseList" :key="index"
+                            :class="{ 'mt-[12px]': item === '\r', 'is-not-same': !isSameLine[index] }">
                             {{ item }}
                         </div>
                     </div>
                 </div>
                 <div class="delete-column-new  w-[50%] flex-1">
                     <div class="bg-gray-300 p-[12px] rounded-[4px]">
-                        <div v-for="(item, index) in previewValue" :key="index" :class="{ 'mt-[12px]': !item.trim() }">
+                        <div v-for="(item, index) in previewValue" :key="index"
+                            :class="{ 'mt-[12px]': !item.trim(), 'is-not-same': !isSameLine[index] }">
                             {{ item }}
                         </div>
                     </div>
@@ -82,8 +84,8 @@ const previewValue = ref([])
 const defaultGroups = ['LAMMPS data file', 'Masses', 'Pair Coeffs', 'Bond Coeffs', 'Angle Coeffs', 'Dihedral Coeffs', 'Improper Coeffs', 'Atoms', 'Bonds', 'Angles', 'Dihedrals', 'Impropers'];
 const defaultDeleteGroups = ['Masses', 'Atoms'];
 
-const groupNames = computed(() => realGroupValue.value.split(',').map(v => v.trim()))
-const useGroups = computed(() => realDeleteValue.value.split(',').map(v => v.trim()))
+const groupNames = computed(() => [...new Set(realGroupValue.value.split(',').map(v => v.trim()))])
+const deleteGroups = computed(() => [...new Set(realDeleteValue.value.split(',').map(v => v.trim()))])
 const fileParseList = computed(() => {
     return fileStr.value.split('\n')
 })
@@ -91,6 +93,18 @@ const fileParseList = computed(() => {
 const isGroup = (line) => {
     return groupNames.value.some((name) => line.startsWith(name))
 }
+
+const isSameLine = computed(() => {
+    const list = [];
+    fileParseList.value.forEach((line, index) => {
+        if (line.trim() !== (previewValue.value[index]?.trim?.() || '')) {
+            list[index] = false;
+        } else {
+            list[index] = true;
+        }
+    })
+    return list;
+})
 
 const fileGroup = computed(() => {
     const list = [];
@@ -132,11 +146,12 @@ const doGroupsChange = () => {
     if (fileData.value) {
         doRead(fileData.value)
     }
+    localStorage.setItem('delete-groups', JSON.stringify(deleteGroups.value));
+    localStorage.setItem('all-groups', JSON.stringify(groupNames.value));
 }
 
 const doPreview = debounce(() => {
     previewValue.value = getDealContent();
-    console.log(' previewValue.value : ',  previewValue.value );
     previewVisible.value = true;
 }, 100)
 
@@ -200,6 +215,7 @@ const getDealContent = () => {
 }
 
 const doDelete = () => {
+    previewVisible.value = false;
     doDownload(getDealContent().join('\n'), fileData.value.name)
 }
 
@@ -207,7 +223,7 @@ const doRead = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
         fileStr.value = e.target.result;
-        const list = fileGroup.value.filter(v => useGroups.value.some(g => v.value.startsWith(g)));
+        const list = fileGroup.value.filter(v => deleteGroups.value.some(g => v.value.startsWith(g)));
         tableData.value = list.filter(v => v.children?.length).map(item => ({ key: item.value, value: '' }))
         console.log(fileGroup.value)
     };
@@ -230,7 +246,7 @@ const initParams = () => {
     realDeleteValue.value = deleteValue.value;
     const str = localStorage.getItem('all-groups');
     if (str) {
-        groupValue.value = JSON.parse(temp).join(',');
+        groupValue.value = JSON.parse(str).join(',');
     } else {
         groupValue.value = defaultGroups.join(',');
     }
@@ -240,3 +256,19 @@ const initParams = () => {
 initParams();
 
 </script>
+
+<style lang="scss" scoped>
+.delete-column {
+    &-old {
+        .is-not-same {
+            background-color: #ffe58f;
+        }
+    }
+
+    &-new {
+        .is-not-same {
+            background-color: #91d5ff;
+        }
+    }
+}
+</style>
