@@ -1,0 +1,1 @@
+import{d as o,c as t,a as s,r,o as n}from"./index-HAqYNAFu.js";const c={class:"tools flex justify-center flex-col items-center"},f=o({__name:"format",setup(a){return console.log("format tools"),(l,_)=>{const e=r("router-view");return n(),t("div",c,[s(e)])}}});export{f as default};
