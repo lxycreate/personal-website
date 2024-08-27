@@ -1,0 +1,1 @@
+import{_ as o,r as t,o as c,c as r,a as s}from"./index-wq43-80I.js";const n={},a={class:"tools flex justify-center flex-col items-center"};function _(f,l){const e=t("router-view");return c(),r("div",a,[s(e)])}const m=o(n,[["render",_]]);export{m as default};

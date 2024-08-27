@@ -13,9 +13,13 @@ import { Menu } from 'ant-design-vue'
 const router = useRouter()
 const route = useRoute()
 const routes: any[] = [{
-    key: 'Format',
-    name: 'Format',
-    label: '格式化'
+    key: 'FormatA',
+    name: 'FormatA',
+    label: '格式化A'
+},{
+    key: 'FormatB',
+    name: 'FormatB',
+    label: '格式化B'
 }, {
     key: "DeleteColumn",
     name: 'DeleteColumn',
