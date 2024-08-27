@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { ConfigProvider } from 'ant-design-vue'
+import zhCN from 'ant-design-vue/es/locale/zh_CN';
 
 </script>
 
 <template>
-  <div class="app w-full h-full">
-    <router-view />
-  </div>
+  <ConfigProvider :locale="zhCN">
+    <div class="app w-full h-full">
+      <router-view />
+    </div>
+  </ConfigProvider>
 </template>

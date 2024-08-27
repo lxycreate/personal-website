@@ -1,0 +1,1 @@
+import{_ as o}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{r as t,o as r,c,a as s}from"./index-CkZO97IX.js";const n={},a={class:"tools flex justify-center flex-col items-center"};function _(f,i){const e=t("router-view");return r(),c("div",a,[s(e)])}const p=o(n,[["render",_]]);export{p as default};
