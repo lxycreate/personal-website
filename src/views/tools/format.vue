@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-
+console.log('format tools')
 </script>
 
 <style lang="scss" scoped>
