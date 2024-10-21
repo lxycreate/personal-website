@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+venv
+species1.csv
+src/views/tools/components/species1.out
